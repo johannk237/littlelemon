@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Little Lemon - Booking Form</title>
+    <script>
+        const today = '{{ today }}';
+
+        function fetchBookings(date) {
+            fetch(`/reservations/?date=${date}`)
+                .then(response => response.json())
+                .then(data => {
+                    const bookings = document.getElementById('bookings');
+                    bookings.innerHTML = '';
+                    if (data.message) {
+                        bookings.innerHTML = `<p>${data.message}</p>`;
+                    } else {
+                        data.forEach(booking => {
+                            const item = document.createElement('li');
+                            item.textContent = `${booking.first_name} - ${booking.reservation_slot}`;
+                            bookings.appendChild(item);
+                        });
+                    }
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const dateInput = document.getElementById('reservation_date');
+            dateInput.value = today;
+            fetchBookings(today);
+
+            dateInput.addEventListener('change', () => {
+                fetchBookings(dateInput.value);
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Booking Form</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="first_name">First Name:</label>
+        <input type="text" id="first_name" name="first_name" required><br>
+        <label for="reservation_date">Reservation Date:</label>
+        <input type="date" id="reservation_date" name="reservation_date" required><br>
+        <label for="reservation_slot">Reservation Slot:</label>
+        <input type="time" id="reservation_slot" name="reservation_slot" required><br>
+        <button type="submit">Book</button>
+    </form>
+    <h2>Current Reservations</h2>
+    <ul id="bookings"></ul>
+</body>
+</html>
