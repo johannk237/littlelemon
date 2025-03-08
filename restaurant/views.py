@@ -1,18 +1,23 @@
-from django.http import JsonResponse
 from django.shortcuts import render
-from .models import Booking
-from datetime import datetime
+from rest_framework import generics
+from rest_framework import viewsets 
+from rest_framework import permissions
+from .serializers import *
+from .models import *
 
-def booking_form(request):
-    today = datetime.today().strftime('%Y-%m-%d')
-    return render(request, 'restaurant/booking_form.html', {'today': today})
+# Create your views here. 
+def index(request):
+    return render(request, 'index.html')
 
-def reservations(request):
-    date = request.GET.get('date')
-    if date:
-        bookings = Booking.objects.filter(reservation_date=date)
-        if bookings.exists():
-            data = list(bookings.values('first_name', 'reservation_date', 'reservation_slot'))
-            return JsonResponse(data, safe=False)
-        return JsonResponse({'message': 'No Booking'}, status=404)
-    return JsonResponse({'message': 'Invalid Date'}, status=400)
+class MenuItemsView(generics.ListCreateAPIView):
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemSerializer
+
+class MenuItemDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemSerializer
+    
+class BookingViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer

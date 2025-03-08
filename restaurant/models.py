@@ -1,12 +1,18 @@
 from django.db import models
 
+# Create your models here.
 class Booking(models.Model):
-    first_name = models.CharField(max_length=100)
-    reservation_date = models.DateField()
-    reservation_slot = models.TimeField()
-
-    class Meta:
-        unique_together = ('reservation_date', 'reservation_slot')
-
+    name = models.CharField(max_length=255)
+    no_of_guests = models.IntegerField()
+    booking_date = models.DateField()
+    
     def __str__(self):
-        return f"{self.first_name} - {self.reservation_date} at {self.reservation_slot}"
+        return self.name
+
+class MenuItem(models.Model):
+    dish = models.CharField(max_length=50)
+    price = models.DecimalField(max_digits=5, decimal_places=2)
+    inventory = models.IntegerField()
+    
+    def __str__(self):
+        return f'{self.dish} : {self.price}'
